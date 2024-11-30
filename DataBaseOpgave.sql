@@ -1,5 +1,5 @@
-CREATE DATABASE JumpForFun;
-USE JumpForFun; -- Køre scriptet "USE JumpForFun;" for at vælge Databasen, og derefter benyt SELECT til at fremvise en tabel, som for eksempel: SELECT * FROM Booking;
+CREATE DATABASE JumpForFunDataBase;
+USE JumpForFunDataBase; -- KÃ¸r scriptet "USE JumpForFunDataBase" for at vÃ¦lge Databasen, og derefter benyt SELECT til at fremvise en tabel, som for eksempel: SELECT * FROM Booking;
 
 
 -- 2.1 Medlemmer
@@ -11,7 +11,7 @@ CREATE TABLE Member (
     Email NVARCHAR(100) UNIQUE NOT NULL,
     BirthDate DATE NOT NULL CHECK (BirthDate <= DATEADD(YEAR, -18, GETDATE())), -- CHECK med DATEADD
     Address NVARCHAR(255) NOT NULL,
-    JoinDate DATE DEFAULT GETDATE() NOT NULL, -- GETDATE() bruges som standardværdi
+    JoinDate DATE DEFAULT GETDATE() NOT NULL, -- GETDATE() bruges som standardvÃ¦rdi
     SubscriptionType NVARCHAR(50) NOT NULL CHECK (SubscriptionType IN ('Basis', 'Premium')) -- ENUM simuleres med CHECK
 );
 
@@ -22,14 +22,14 @@ CREATE TABLE Center (
     Location NVARCHAR(100) NOT NULL
 );
 
--- 2.3 Trænere
+-- 2.3 TrÃ¦nere
 CREATE TABLE Trainer (
     TrainerID INT IDENTITY(1, 1) PRIMARY KEY,
     Name NVARCHAR(100) NOT NULL,
     Phone NVARCHAR(15) UNIQUE NOT NULL
 );
 
--- 2.4 Træningsrum
+-- 2.4 TrÃ¦ningsrum
 CREATE TABLE TrainingRoom (
     RoomID INT IDENTITY(1, 1) PRIMARY KEY,
     CenterID INT NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE Booking (
     BookingDate DATE DEFAULT GETDATE() NOT NULL,
     FOREIGN KEY (MemberID) REFERENCES Member(MemberID),
     FOREIGN KEY (ClassID) REFERENCES Class(ClassID),
-    CONSTRAINT UniqueBooking UNIQUE (MemberID, ClassID) -- Et medlem kan kun booke et hold én gang
+    CONSTRAINT UniqueBooking UNIQUE (MemberID, ClassID) -- Et medlem kan kun booke et hold Ã©n gang
 );
 
 -- 3. Opretter Trigger
@@ -74,41 +74,41 @@ BEGIN
         WHERE StartTime >= EndTime
     )
     BEGIN
-        RAISERROR ('StartTime skal være tidligere end EndTime.', 16, 1);
+        RAISERROR ('StartTime skal vÃ¦re tidligere end EndTime.', 16, 1);
         ROLLBACK;
     END
 END;
 
-INSERT INTO Class (ClassType, MaxParticipants, StartTime, EndTime, RoomID, TrainerID) -- Tester Trigger ved at indsætte ugyldigt StartTime og Endtime
+INSERT INTO Class (ClassType, MaxParticipants, StartTime, EndTime, RoomID, TrainerID) -- Tester Trigger ved at indsÃ¦tte ugyldigt StartTime og Endtime
 VALUES ('Fejltest', 25, '2024-11-24 13:00:00', '2024-11-24 12:00:00', 1, 1);
 
 -- 4.1 Centre
 INSERT INTO Center (CenterName, Location)
 VALUES ('Ringsted Center', 'Ringsted'),
-       ('Køge Center', 'Køge'),
+       ('KÃ¸ge Center', 'KÃ¸ge'),
        ('Roskilde Center', 'Roskilde'),
-       ('Holbæk Center', 'Holbæk');
+       ('HolbÃ¦k Center', 'HolbÃ¦k');
 
--- 4.2 Trænere
+-- 4.2 TrÃ¦nere
 INSERT INTO Trainer (Name, Phone)
-VALUES ('Amir Jawad', '12345678'),
-       ('Will Smith', '87654321');
+VALUES ('Amir Jawad', '20345532'),
+       ('Hasnain Ali', '30442234');
 
--- 4.3 Træningsrum
+-- 4.3 TrÃ¦ningsrum
 INSERT INTO TrainingRoom (CenterID, RoomNumber)
 VALUES (1, 1), (1, 2), (2, 1), (2, 2);
 
 -- 4.4 Hold
 INSERT INTO Class (ClassType, MaxParticipants, StartTime, EndTime, RoomID, TrainerID)
-VALUES ('Hop for begyndere', 20, '2024-11-24 10:00:00', '2024-11-24 11:00:00', 1, 1),
-       ('Intensiv hop', 25, '2024-11-24 12:00:00', '2024-11-24 13:00:00', 2, 2);
+VALUES ('intensiv hop', 20, '2024-11-30 11:00:00', '2024-11-30 12:00:00', 1, 1),
+       ('Yoga Ã¸velse', 25, '2024-11-30 13:00:00', '2024-11-30 14:00:00', 2, 2);
 
 -- 4.5 Medlemmer
 INSERT INTO Member (FirstName, LastName, PhoneNumber, Email, BirthDate, Address, SubscriptionType)
-VALUES ('Ali', 'Bashir', '12345678', 'ali.Bashir@gmail.com', '2000-01-01', 'Vej 12, 4000 Roskilde', 'Basis'),
-       ('Sara', 'Larsen', '87654321', 'sara.larsen@gmail.com', '1995-05-15', 'Gade 34, 4100 Ringsted', 'Premium');
+VALUES ('Ali', 'Jaseem', '23443211', 'Ali.Jaseem@gmail.com', '1998-04-05', 'Vej 12, 4000 Roskilde', 'Basis'),
+       ('Sarah', 'Mikkelsen', '55243322', 'Sarah.Mikkelsen@gmail.com', '1994-03-12', 'Gade 34, 4100 Ringsted', 'Premium');
 
-INSERT INTO Member (FirstName, LastName, PhoneNumber, Email, BirthDate, Address, SubscriptionType) -- Test for at tjekke om personer under 18 år kan være medlem
+INSERT INTO Member (FirstName, LastName, PhoneNumber, Email, BirthDate, Address, SubscriptionType) -- Test for at tjekke om personer under 18 Ã¥r kan vÃ¦re medlem
 VALUES ('Jens', 'Jensen', '92345678', 'Jens.Jensen@gmail.com', '2010-01-01', 'Vej 12, 4000 Roskilde', 'Basis');
 
 -- 4.6 Bookinger
@@ -123,5 +123,17 @@ SELECT * FROM Trainer;
 SELECT * FROM TrainingRoom;
 SELECT * FROM Class;
 SELECT * FROM Booking;
+
+-- Viser alle trÃ¦ningssessioner, deres trÃ¦nere og trÃ¦ningsrum
+SELECT 
+    c.ClassType AS session_type,
+    t.Name AS trainer_name,
+    tr.RoomNumber AS training_room,
+    cen.CenterName AS center_name
+FROM Class c
+JOIN Trainer t ON c.TrainerID = t.TrainerID
+JOIN TrainingRoom tr ON c.RoomID = tr.RoomID
+JOIN Center cen ON tr.CenterID = cen.CenterID;
+
 
 
